@@ -22,7 +22,7 @@ func Start(port string) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Listening on port %s...\n", port)
+	fmt.Printf("Listening on port %s\n", port)
 	defer pc.Close()
 
 	messages := make(chan string, 3)
@@ -49,11 +49,11 @@ func Start(port string) {
 		case user := <-users:
 			fmt.Printf("Handshake received from %s\n", user.name)
 			userList = append(userList, user)
-			fmt.Printf("Users connected %s\n", GetNames(userList))
+			fmt.Printf("Users connected: %s\n", GetNames(userList))
 		case leaver := <-leavers:
 			userList = RemoveUser(userList, leaver)
-			fmt.Printf("%s has been removed...\n", leaver)
-			fmt.Printf("Users connected %s\n", GetNames(userList))
+			fmt.Printf("%s has been removed\n", leaver)
+			fmt.Printf("Users connected: %s\n", GetNames(userList))
 		}
 
 	}
@@ -68,7 +68,7 @@ func read(pc net.PacketConn, addr net.Addr, buf []byte, messages chan string, us
 		// typeStr = "handshake"
 		name, _ := protocol.UnpackString(buf, 1)
 		users <- User{name, addr}
-		response = protocol.NewPacketHandshakeAck().Pack()
+		response = protocol.PacketHandshakeAck().Pack()
 		break
 	case protocol.Opcodes()["message"]:
 		// typeStr = "message"
@@ -76,16 +76,16 @@ func read(pc net.PacketConn, addr net.Addr, buf []byte, messages chan string, us
 		msg, _ := protocol.UnpackString(buf, end)
 		msg = string("<" + name + "> " + msg)
 		messages <- msg
-		emit(pc, userList, protocol.NewPacketMessage(name, msg).Pack())
-		response = protocol.NewPacketMessageAck().Pack()
+		emit(pc, userList, protocol.PacketMessage(name, msg).Pack())
+		response = protocol.PacketMessageAck().Pack()
 		break
 	case protocol.Opcodes()["leave"]:
 		name, _ := protocol.UnpackString(buf, 1)
 		leavers <- name
-		response = protocol.NewPacketLeaveAck().Pack()
+		response = protocol.PacketLeaveAck().Pack()
 		break
 	default:
-		response = protocol.NewPacketUnknownRequestAck().Pack()
+		response = protocol.PacketUnknownRequestAck().Pack()
 		break
 	}
 

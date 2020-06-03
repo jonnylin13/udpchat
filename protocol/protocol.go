@@ -13,48 +13,48 @@ func Opcodes() map[string]byte {
 	}
 }
 
-// NewPacketHandshake returns a handshake packet.
-func NewPacketHandshake(name string) Packet {
+// PacketHandshake returns a handshake packet.
+func PacketHandshake(name string) Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["handshake"]
 	p.payload = PackString(name)
 	return p
 }
 
-// NewPacketHandshakeAck returns a handshake ack packet.
-func NewPacketHandshakeAck() Packet {
+// PacketHandshakeAck returns a handshake ack packet.
+func PacketHandshakeAck() Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["handshake_ack"]
 	p.payload = []byte{}
 	return p
 }
 
-// NewPacketLeave returns a leave packet.
-func NewPacketLeave(name string) Packet {
+// PacketLeave returns a leave packet.
+func PacketLeave(name string) Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["leave"]
 	p.payload = PackString(name)
 	return p
 }
 
-// NewPacketLeaveAck returns a leave ack packet.
-func NewPacketLeaveAck() Packet {
+// PacketLeaveAck returns a leave ack packet.
+func PacketLeaveAck() Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["leave_ack"]
 	p.payload = []byte{}
 	return p
 }
 
-// NewPacketUnknownRequestAck returns an unknown request ack packet.
-func NewPacketUnknownRequestAck() Packet {
+// PacketUnknownRequestAck returns an unknown request ack packet.
+func PacketUnknownRequestAck() Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["unknown_ack"]
 	p.payload = []byte{}
 	return p
 }
 
-// NewPacketMessage returns a message packet.
-func NewPacketMessage(name string, msg string) Packet {
+// PacketMessage returns a message packet.
+func PacketMessage(name string, msg string) Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["message"]
 	nameField := PackString(name)
@@ -66,8 +66,8 @@ func NewPacketMessage(name string, msg string) Packet {
 	return p
 }
 
-// NewPacketMessageAck returns a message ack packet.
-func NewPacketMessageAck() Packet {
+// PacketMessageAck returns a message ack packet.
+func PacketMessageAck() Packet {
 	p := Packet{}
 	p.opcode = Opcodes()["message_ack"]
 	p.payload = []byte{}

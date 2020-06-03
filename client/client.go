@@ -40,7 +40,7 @@ func Start(addressStr string) {
 		return
 	}
 
-	fmt.Printf("The UDP server is %s...\n", pc.RemoteAddr().String())
+	fmt.Printf("Connected to server: %s\n", pc.RemoteAddr().String())
 	defer pc.Close()
 
 	name := ""
@@ -61,9 +61,9 @@ func Start(addressStr string) {
 		select {
 		case signal := <-sigint:
 			if name != "" && signal == os.Interrupt {
-				pc.Write(protocol.NewPacketLeave(name).Pack())
+				pc.Write(protocol.PacketLeave(name).Pack())
 			}
-			fmt.Printf("Done.\n")
+			fmt.Printf("Done\n")
 			return
 		case msg := <-messages:
 			fmt.Println(msg)
@@ -77,35 +77,35 @@ func Start(addressStr string) {
 				switch cmd {
 				case "message":
 					if len(name) == 0 {
-						fmt.Printf("Use handshake <name> first...\n")
+						fmt.Printf("Use handshake <name> first\n")
 						continue
 					}
 					// fmt.Println("Sending message...")
-					data = protocol.NewPacketMessage(name, text).Pack()
+					data = protocol.PacketMessage(name, text).Pack()
 					break
 				case "handshake":
-					data = protocol.NewPacketHandshake(text).Pack()
+					data = protocol.PacketHandshake(text).Pack()
 					name = text
-					fmt.Printf("Sending handshake...\n")
+					fmt.Printf("Sending handshake\n")
 					break
 				default:
-					fmt.Printf("Invalid command %s...\n", cmd)
+					fmt.Printf("Invalid command %s\n", cmd)
 					continue
 				}
 			} else {
 				switch cmd {
 				case "quit":
 					if len(name) > 0 {
-						pc.Write(protocol.NewPacketLeave(name).Pack())
+						pc.Write(protocol.PacketLeave(name).Pack())
 					}
-					fmt.Printf("Done.\n")
+					fmt.Printf("Done\n")
 					return
 				case "leave":
-					data = protocol.NewPacketLeave(name).Pack()
+					data = protocol.PacketLeave(name).Pack()
 					name = ""
 					break
 				default:
-					fmt.Printf("Invalid command %s...\n", cmd)
+					fmt.Printf("Invalid command %s\n", cmd)
 					continue
 				}
 			}
@@ -130,7 +130,7 @@ func read(pc *net.UDPConn, messages chan string, screen *bytes.Buffer) {
 
 	switch buf[0] {
 	case protocol.Opcodes()["handshake_ack"]:
-		fmt.Printf("Connected...\n")
+		fmt.Printf("Connected to lobby\n")
 		// resType = "handshake_ack"
 		break
 	case protocol.Opcodes()["message_ack"]:
@@ -143,7 +143,7 @@ func read(pc *net.UDPConn, messages chan string, screen *bytes.Buffer) {
 		messages <- msg
 		break
 	case protocol.Opcodes()["leave_ack"]:
-		fmt.Printf("Left the lobby...\n")
+		fmt.Printf("Left the lobby\n")
 		break
 	default:
 		break
