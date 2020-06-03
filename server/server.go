@@ -10,7 +10,7 @@ import (
 
 func emit(pc net.PacketConn, users []User, data []byte) {
 	for _, user := range users {
-		pc.WriteTo(data, user.addr)
+		pc.WriteTo(data, user.Addr)
 	}
 }
 
@@ -47,7 +47,7 @@ func Start(port string) {
 		case msg := <-messages:
 			fmt.Printf("Message: %s\n", msg)
 		case user := <-users:
-			fmt.Printf("Handshake received from %s\n", user.name)
+			fmt.Printf("Handshake received from %s\n", user.Name)
 			userList = append(userList, user)
 			fmt.Printf("Users connected: %s\n", GetNames(userList))
 		case leaver := <-leavers:

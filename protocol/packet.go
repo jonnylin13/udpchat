@@ -4,13 +4,13 @@ import "encoding/binary"
 
 // Packet represents a 1 Kb packet.
 type Packet struct {
-	opcode  byte
-	payload []byte
+	Opcode  byte
+	Payload []byte
 }
 
-// Pack the Packet into a byte array.
+// Pack packs the Packet into a []byte.
 func (p Packet) Pack() []byte {
-	buf := append([]byte{p.opcode}, p.payload[:]...)
+	buf := append([]byte{p.Opcode}, p.Payload[:]...)
 	buf = append(buf, make([]byte, 1024-len(buf))...)
 	return buf
 }
