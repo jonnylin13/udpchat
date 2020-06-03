@@ -18,7 +18,8 @@ func (p Packet) Pack() []byte {
 // UnpackString unpacks a string field of a packet.
 func UnpackString(buf []byte, start int) (str string, end int) {
 	strLength := binary.LittleEndian.Uint16(buf[start : start+2])
-	return string(buf[start+2 : start+2+int(strLength)]), start + 2 + int(strLength)
+	length := int(strLength)
+	return string(buf[start+2 : start+2+length]), start + 2 + length
 }
 
 // PackString packs a string field of a packet.
