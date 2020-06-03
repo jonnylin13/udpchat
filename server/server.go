@@ -39,7 +39,7 @@ func emit(pc net.PacketConn, users []User, data []byte) {
 
 // Start the server
 func Start(port string) {
-	pc, err := net.ListenPacket("udp", ":"+port)
+	pc, err := net.ListenPacket("udp", port)
 
 	if err != nil {
 		log.Fatal(err)
