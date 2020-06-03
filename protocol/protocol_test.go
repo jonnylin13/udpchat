@@ -17,7 +17,7 @@ func TestUnpackString(t *testing.T) {
 func TestPackString(t *testing.T) {
 	expected := []byte{22, 0, 84, 104, 105, 115, 32, 105, 115, 32, 97, 32, 116, 101, 115, 116, 32, 101, 120, 97, 109, 112, 108, 101}
 	str := "This is a test example"
-	got := packString(str)
+	got := PackString(str)
 	if !bytes.Equal(got, expected) {
 		t.Errorf("packString(...) = %d, expected: %d", got, expected)
 	}
