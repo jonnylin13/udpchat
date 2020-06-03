@@ -8,36 +8,13 @@ import (
 	"github.com/jonnylin13/udpchat/protocol"
 )
 
-// User represents a user
-type User struct {
-	name string
-	addr net.Addr
-}
-
-func getNames(userList []User) []string {
-	var list []string
-	for _, user := range userList {
-		list = append(list, user.name)
-	}
-	return list
-}
-
-func removeUser(userList []User, name string) []User {
-	for i, user := range userList {
-		if user.name == name {
-			return append(userList[:i], userList[i+1:]...)
-		}
-	}
-	return userList
-}
-
 func emit(pc net.PacketConn, users []User, data []byte) {
 	for _, user := range users {
 		pc.WriteTo(data, user.addr)
 	}
 }
 
-// Start the server
+// Start the server.
 func Start(port string) {
 	pc, err := net.ListenPacket("udp", port)
 
@@ -72,11 +49,11 @@ func Start(port string) {
 		case user := <-users:
 			fmt.Printf("Handshake received from %s\n", user.name)
 			userList = append(userList, user)
-			fmt.Printf("Users connected %s\n", getNames(userList))
+			fmt.Printf("Users connected %s\n", GetNames(userList))
 		case leaver := <-leavers:
-			userList = removeUser(userList, leaver)
+			userList = RemoveUser(userList, leaver)
 			fmt.Printf("%s has been removed...\n", leaver)
-			fmt.Printf("Users connected %s\n", getNames(userList))
+			fmt.Printf("Users connected %s\n", GetNames(userList))
 		}
 
 	}

@@ -31,7 +31,7 @@ func clearTerminal(output *bufio.Writer) {
 	cmd.Run()
 }
 
-// Start the client
+// Start the client.
 func Start(addressStr string) {
 	addr, err := net.ResolveUDPAddr("udp4", addressStr)
 	pc, err := net.DialUDP("udp4", nil, addr)
