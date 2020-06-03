@@ -31,16 +31,28 @@ func clearTerminal(output *bufio.Writer) {
 	cmd.Run()
 }
 
+// Connect to a chatroom.
+func Connect(addrStr string) (addr *net.UDPAddr, pc *net.UDPConn, err error) {
+	addr, err = net.ResolveUDPAddr("udp4", addrStr)
+	pc, err = net.DialUDP("udp4", nil, addr)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fmt.Printf("Connected to server: %s\n", pc.RemoteAddr().String())
+	return addr, pc, err
+}
+
 // Start the client.
-func Start(addressStr string) {
-	addr, err := net.ResolveUDPAddr("udp4", addressStr)
-	pc, err := net.DialUDP("udp4", nil, addr)
+func Start(addrStr string) {
+
+	_, pc, err := Connect(addrStr)
 
 	if handleError(err) {
 		return
 	}
 
-	fmt.Printf("Connected to server: %s\n", pc.RemoteAddr().String())
 	defer pc.Close()
 
 	name := ""
@@ -75,19 +87,29 @@ func Start(addressStr string) {
 				text = strings.TrimSpace(texts[1])
 				// Parse the payload
 				switch cmd {
-				case "message":
+				case "message", "msg":
 					if len(name) == 0 {
-						fmt.Printf("Use handshake <name> first\n")
+						fmt.Printf("Use handshake <nickname> first\n")
 						continue
 					}
-					// fmt.Println("Sending message...")
 					data = protocol.PacketMessage(name, text).Pack()
 					break
 				case "handshake":
 					data = protocol.PacketHandshake(text).Pack()
 					name = text
-					fmt.Printf("Sending handshake\n")
+					fmt.Printf("Sending handshake as %s\n", name)
 					break
+				case "connect":
+					if len(name) > 0 {
+						pc.Write(protocol.PacketLeave(name).Pack())
+						fmt.Printf("Disconnected from %s\n", pc.RemoteAddr().String())
+					}
+					_, pc, err = Connect(text)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					continue
 				default:
 					fmt.Printf("Invalid command %s\n", cmd)
 					continue
@@ -104,6 +126,16 @@ func Start(addressStr string) {
 					data = protocol.PacketLeave(name).Pack()
 					name = ""
 					break
+				case "help":
+					fmt.Printf("\n")
+					fmt.Println("-- udpchat help --")
+					fmt.Println("handshake <nickname> - Join the chatroom with a desired name")
+					fmt.Println("msg <message> - Send a message to the chatroom")
+					fmt.Println("connect <host> - Connect to a different chatroom")
+					fmt.Println("leave - Leave the chatroom")
+					fmt.Println("quit - Quit the application")
+					fmt.Printf("\n")
+					continue
 				default:
 					fmt.Printf("Invalid command %s\n", cmd)
 					continue
